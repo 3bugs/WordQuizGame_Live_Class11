@@ -26,8 +26,16 @@ public class MainActivity extends AppCompatActivity {
     private class MyListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            Toast t = Toast.makeText(MainActivity.this, "Hello", Toast.LENGTH_SHORT);
-            t.show();
+            int id = v.getId();
+
+            if (id == R.id.playGameButton) {
+                Toast t = Toast.makeText(MainActivity.this, "Hello", Toast.LENGTH_SHORT);
+                t.show();
+            } else if (id == R.id.highScoreButton) {
+                Toast t = Toast.makeText(MainActivity.this, "Android", Toast.LENGTH_SHORT);
+                t.show();
+            }
+
         }
     }
 }
