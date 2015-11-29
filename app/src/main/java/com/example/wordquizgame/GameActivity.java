@@ -7,6 +7,8 @@ import android.util.Log;
 
 public class GameActivity extends AppCompatActivity {
 
+    private static final String TAG = "GameActivity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -22,6 +24,6 @@ public class GameActivity extends AppCompatActivity {
                 age
         );
 
-        Log.i("GameActivity", msg);
+        Log.i(TAG, msg);
     }
 }
