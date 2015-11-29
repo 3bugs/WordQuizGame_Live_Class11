@@ -52,11 +52,8 @@ public class MainActivity extends AppCompatActivity {
         highScoreButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(
-                        MainActivity.this,
-                        "Android",
-                        Toast.LENGTH_LONG
-                ).show();
+                Intent i = new Intent(MainActivity.this, HighScoreActivity.class);
+                startActivity(i);
             }
         });
     }
