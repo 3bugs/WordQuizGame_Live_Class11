@@ -1,10 +1,13 @@
 package com.example.wordquizgame;
 
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.AssetManager;
+import android.content.res.Configuration;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.Handler;
@@ -20,6 +23,8 @@ import android.widget.ImageView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+
+import com.example.wordquizgame.db.DatabaseHelper;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,6 +57,21 @@ public class GameActivity extends AppCompatActivity {
     private Handler mHandler = new Handler();
 
     private Animation shakeAnimation;
+
+    private DatabaseHelper mHelper;
+    private SQLiteDatabase mDatabase;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Music.play(this, R.raw.game);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Music.stop();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +107,9 @@ public class GameActivity extends AppCompatActivity {
 
         shakeAnimation = AnimationUtils.loadAnimation(this, R.anim.shake);
         shakeAnimation.setRepeatCount(3);
+
+        mHelper = new DatabaseHelper(this);
+        mDatabase = mHelper.getWritableDatabase();
 
         getImageFileName();
     }
@@ -254,6 +277,9 @@ public class GameActivity extends AppCompatActivity {
 
             // ตอบถูก และเล่นครบทุกข้อแล้ว (จบเกม)
             if (mScore == NUM_QUESTIONS_PER_QUIZ) {
+
+                saveScore();
+
                 String msgResult = String.format(
                         "จำนวนครั้งที่ทาย: %d\nเปอร์เซ็นต์ความถูกต้อง: %.1f",
                         mTotalGuesses,
@@ -302,6 +328,15 @@ public class GameActivity extends AppCompatActivity {
 
             button.setEnabled(false);
         }
+    }
+
+    private void saveScore() {
+        ContentValues cv = new ContentValues();
+        double percent = (100 * NUM_QUESTIONS_PER_QUIZ) / (double) mTotalGuesses;
+        cv.put(DatabaseHelper.COL_SCORE, percent);
+        cv.put(DatabaseHelper.COL_DIFFICULTY, mDifficulty);
+
+        mDatabase.insert(DatabaseHelper.TABLE_NAME, null, cv);
     }
 
     private void disableAllButtons() {
