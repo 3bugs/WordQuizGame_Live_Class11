@@ -1,5 +1,6 @@
 package com.example.wordquizgame;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.graphics.drawable.Drawable;
@@ -7,8 +8,12 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -143,6 +148,7 @@ public class GameActivity extends AppCompatActivity {
 
         loadQuestionImage();
         prepareChoiceWords();
+        createChoiceButtons();
     }
 
     private void loadQuestionImage() {
@@ -181,6 +187,38 @@ public class GameActivity extends AppCompatActivity {
         Log.i(TAG, "*** คำศัพท์ตัวเลือกที่สุ่มได้ ***");
         for (String word : mChoiceWordList) {
             Log.i(TAG, word);
+        }
+
+    }
+
+    private void createChoiceButtons() {
+        for (int row = 0; row < mButtonTableLayout.getChildCount(); row++) {
+            TableRow tr = (TableRow) mButtonTableLayout.getChildAt(row);
+            tr.removeAllViews();
+        }
+
+        LayoutInflater inflater = (LayoutInflater) getSystemService(
+                Context.LAYOUT_INFLATER_SERVICE);
+
+        for (int row = 0; row < mNumChoices / 2; row++) {
+            TableRow tr = (TableRow) mButtonTableLayout.getChildAt(row);
+
+            for (int column = 0; column < 2; column++) {
+                Button guessButton = (Button) inflater.inflate(
+                        R.layout.guess_button,
+                        tr,
+                        false
+                );
+
+                guessButton.setText(mChoiceWordList.remove(0));
+                guessButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //
+                    }
+                });
+                tr.addView(guessButton);
+            }
         }
     }
 
