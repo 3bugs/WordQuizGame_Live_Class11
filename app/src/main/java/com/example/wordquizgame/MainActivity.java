@@ -30,22 +30,20 @@ public class MainActivity extends AppCompatActivity {
                 AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
                 dialog.setTitle(R.string.choose_diff_label);
 
-                String[] diffLabels = new String[]{"ง่าย", "ปานกลาง", "ยาก"};
+                final String[] diffLabels = new String[]{"ง่าย", "ปานกลาง", "ยาก"};
 
                 dialog.setItems(diffLabels, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Log.i(TAG, "คุณเลือก: " + which);
+                        Log.i(TAG, "คุณเลือก: " + diffLabels[which]);
+
+                        Intent i = new Intent(MainActivity.this, GameActivity.class);
+                        i.putExtra("diff", which);
+                        startActivity(i);
                     }
                 });
 
                 dialog.show();
-/*
-                Intent i = new Intent(MainActivity.this, GameActivity.class);
-                i.putExtra("user", "Promlert");
-                i.putExtra("age", 41);
-                startActivity(i);
-*/
             }
         });
 
