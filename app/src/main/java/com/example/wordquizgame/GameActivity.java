@@ -2,6 +2,7 @@ package com.example.wordquizgame;
 
 import android.content.Intent;
 import android.content.res.AssetManager;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,7 +12,9 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
 public class GameActivity extends AppCompatActivity {
@@ -42,6 +45,11 @@ public class GameActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+
+        mQuestionNumberTextView = (TextView) findViewById(R.id.questionNumberTextView);
+        mQuestionImageView = (ImageView) findViewById(R.id.questionImageView);
+        mButtonTableLayout = (TableLayout) findViewById(R.id.buttonTableLayout);
+        mAnswerTextView = (TextView) findViewById(R.id.answerTextView);
 
         Intent i = getIntent();
         mDifficulty = i.getIntExtra("diff", 0);
@@ -97,8 +105,97 @@ public class GameActivity extends AppCompatActivity {
         mTotalGuesses = 0;
         mQuizWordList.clear();
 
+/*
+        Collections.shuffle(mFileNameList);
+        for (int i = 0; i < NUM_QUESTIONS_PER_QUIZ; i++) {
+            mQuizWordList.add(mFileNameList.get(i));
+        }
+*/
+
         while (mQuizWordList.size() < NUM_QUESTIONS_PER_QUIZ) {
             int randomIndex = mRandom.nextInt(mFileNameList.size());
+            String filename = mFileNameList.get(randomIndex);
+
+            if (mQuizWordList.contains(filename) == false) {
+                mQuizWordList.add(filename);
+            }
+        }
+
+        Log.i(TAG, "*** ชื่อไฟล์คำถามที่สุ่มได้ ***");
+        for (String filename : mQuizWordList) {
+            Log.i(TAG, filename);
+        }
+
+        loadNextQuestion();
+    }
+
+    private void loadNextQuestion() {
+        mAnswerTextView.setText(null);
+
+        String msg = String.format(
+                "คำถาม %d จาก %d",
+                mScore + 1,
+                NUM_QUESTIONS_PER_QUIZ
+        );
+        mQuestionNumberTextView.setText(msg);
+
+        mAnswerFileName = mQuizWordList.remove(0);
+
+        loadQuestionImage();
+        prepareChoiceWords();
+    }
+
+    private void loadQuestionImage() {
+        String category = mAnswerFileName.substring(0, mAnswerFileName.indexOf('-'));
+        String filePath = category + "/" + mAnswerFileName + ".png";
+
+        AssetManager assets = getAssets();
+        try {
+            InputStream stream = assets.open(filePath);
+            Drawable image = Drawable.createFromStream(stream, filePath);
+            mQuestionImageView.setImageDrawable(image);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.e(TAG, "Error loading file: " + filePath);
         }
     }
+
+    private void prepareChoiceWords() {
+        mChoiceWordList.clear();
+        String answerWord = getWord(mAnswerFileName);
+
+        while (mChoiceWordList.size() < mNumChoices) {
+            int randomIndex = mRandom.nextInt(mFileNameList.size());
+            String randomWord = getWord(mFileNameList.get(randomIndex));
+
+            if (mChoiceWordList.contains(randomWord) == false &&
+                    randomWord.equals(answerWord) == false) {
+                mChoiceWordList.add(randomWord);
+            }
+        }
+
+        int randomIndex = mRandom.nextInt(mChoiceWordList.size());
+        mChoiceWordList.set(randomIndex, answerWord);
+
+        Log.i(TAG, "*** คำศัพท์ตัวเลือกที่สุ่มได้ ***");
+        for (String word : mChoiceWordList) {
+            Log.i(TAG, word);
+        }
+    }
+
+    private String getWord(String filename) {
+        return filename.substring(filename.indexOf('-') + 1);
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
